@@ -28,27 +28,24 @@ module.exports.requestHandler = function(request, response) {
     'access-control-allow-headers': 'content-type, accept',
     'access-control-max-age': 10 // Seconds.
   };
+
   // set headers
   var headers = defaultCorsHeaders;
-
+  var dataPath = path.join(__dirname, 'data.json');
 
   if (request.method === 'GET' && request.url === '/classes/messages') {
     headers['Content-Type'] = 'application/json';
     response.writeHead(200, headers);
 
-    var dataPath = path.join(__dirname, 'data.json');
-
     fs.readFile(dataPath, 'utf8', (error, data) => {
       response.end(data);
     });
-
 
   } else if (request.method === 'POST' && request.url === '/classes/messages') {
     response.writeHead(201, headers);
 
     var postData = '';
     var dataPath = path.join(__dirname, 'data.json');
-    var data = '';
 
     request.on('data', data => {
       postData += data;
@@ -56,40 +53,30 @@ module.exports.requestHandler = function(request, response) {
 
     request.on('end', () => {
       var message = JSON.parse(postData);
-      message.createdAt = Date.now();
+      message.createdAt = new Date( Date.now() );
 
-      var readStream = fs.createReadStream(dataPath, 'utf8');
-      readStream.on('data', chunk => { data += chunk; });
-      readStream.on('end', () => {
+      fs.readFile(dataPath, 'utf8', (error, data) => {
         var parsedData = JSON.parse(data);
         parsedData.results.unshift(message);
 
         fs.writeFile(dataPath, JSON.stringify(parsedData), 'utf8', (err) => {
           if (err) { throw err; }
           console.log('wrote new data!');
-          response.end();
+          response.end(data);
         });
       });
-
-      readStream.on('error', (err) => { throw err; });
     });
-
 
   } else if (request.method === 'POST' && request.url === '/classes/room') {
     response.writeHead(201, headers);
-    console.log('post to classes/room');
     response.end();
 
-
   } else if (request.method === 'OPTIONS') {
-    console.log('post to classes/messages');
     response.writeHead(200, headers);
     response.end();
 
-
   } else {
-    console.log('404');
-    response.statusCode = 404;
+    response.writeHead(404, headers);
     response.end();
   }
 };

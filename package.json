@@ -12,7 +12,7 @@
     "postinstall": "curl -s https://raw.githubusercontent.com/reactorcore/pomander/master/bin/install | bash",
     "start": "nodemon server/basic-server.js",
     "start:es6": "babel-node server/basic-server.js --watch",
-    "test": "mocha server/spec --watch",
+    "test": "mocha server/spec",
     "test:es6": "mocha --compilers js:babel-register server/spec",
     "lint": "eslint ./",
     "debug": "nodemon --inspect server/basic-server.js",
