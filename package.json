@@ -10,12 +10,12 @@
   },
   "scripts": {
     "postinstall": "curl -s https://raw.githubusercontent.com/reactorcore/pomander/master/bin/install | bash",
-    "start": "nodemon server/basic-server.js",
+    "start": "nodemon server/basic-server.js --ignore 'server/data.json'",
     "start:es6": "babel-node server/basic-server.js --watch",
     "test": "mocha server/spec",
     "test:es6": "mocha --compilers js:babel-register server/spec",
     "lint": "eslint ./",
-    "debug": "nodemon --inspect server/basic-server.js",
+    "debug": "nodemon --inspect server/basic-server.js  --ignore 'server/data.json'",
     "debug-brk": "nodemon --inspect --debug-brk server/basic-server.js"
   },
   "devDependencies": {

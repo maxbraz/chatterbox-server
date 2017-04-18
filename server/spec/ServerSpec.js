@@ -7,7 +7,7 @@ var stubs = require('./Stubs');
 var waitForThen = function (test, cb) {
   setTimeout(function() {
     test() ? cb.apply(this) : waitForThen(test, cb);
-  }, 5);
+  }, 1000);
 };
 
 describe('Node Server Request Listener Function', function() {
@@ -34,7 +34,7 @@ describe('Node Server Request Listener Function', function() {
     setTimeout(() => {
       expect(JSON.parse.bind(this, res._data)).to.not.throw();
       expect(res._ended).to.equal(true);
-    }, 1000);
+    }, 2000);
 
   });
 
@@ -48,7 +48,7 @@ describe('Node Server Request Listener Function', function() {
     setTimeout(() => {
       expect(parsedBody).to.be.an('object');
       expect(res._ended).to.equal(true);
-    }, 1000);
+    }, 3000);
   });
 
   it('Should send an object containing a `results` array', function() {
@@ -62,7 +62,7 @@ describe('Node Server Request Listener Function', function() {
       expect(parsedBody).to.have.property('results');
       expect(parsedBody.results).to.be.an('array');
       expect(res._ended).to.equal(true);
-    }, 1000);
+    }, 4000);
   });
 
   it('Should accept posts to /classes/room', function() {
@@ -74,14 +74,15 @@ describe('Node Server Request Listener Function', function() {
     var res = new stubs.response();
 
     handler.requestHandler(req, res);
+    setTimeout(() => {
+      // Expect 201 Created response status
+      expect(res._responseCode).to.equal(201);
 
-    // Expect 201 Created response status
-    expect(res._responseCode).to.equal(201);
-
-    // Testing for a newline isn't a valid test
-    // TODO: Replace with with a valid test
-    // expect(res._data).to.equal(JSON.stringify('\n'));
-    expect(res._ended).to.equal(true);
+      // Testing for a newline isn't a valid test
+      // TODO: Replace with with a valid test
+      // expect(res._data).to.equal(JSON.stringify('\n'));
+      expect(res._ended).to.equal(true);
+    }, 1000);
   });
 
   it('Should respond with messages that were previously posted', function() {
@@ -101,7 +102,7 @@ describe('Node Server Request Listener Function', function() {
     res = new stubs.response();
 
     handler.requestHandler(req, res);
-    
+
     setTimeout(() => {
       expect(res._responseCode).to.equal(200);
       var messages = JSON.parse(res._data).results;

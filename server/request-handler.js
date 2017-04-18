@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const qs = require('querystring');
 
 /*************************************************************
 
@@ -42,25 +43,30 @@ module.exports.requestHandler = function(request, response) {
     });
 
 
-  } else if (request.method === 'POST' && request.url === '/classes/messages') {
+  } else if (request.method === 'POST' && (request.url === '/classes/messages' || request.url === '/classes/messages')) {
     response.writeHead(201, headers);
 
     var postData = '';
-    var dataPath = path.join(__dirname, 'data.json');
-
     request.on('data', data => {
       postData += data;
     });
 
     request.on('end', () => {
-      var message = JSON.parse(postData);
+      console.log('CLASSSES/MESSAGES ', postData);
+      // var message = JSON.parse(postData);
+      var message = qs.parse(postData);
       message.createdAt = new Date( Date.now() );
+      message.objectId = Date.now();
 
       fs.readFile(dataPath, 'utf8', (error, data) => {
         var parsedData = JSON.parse(data);
+
+        parsedData.results = parsedData.results || [];
         parsedData.results.unshift(message);
 
-        fs.writeFile(dataPath, JSON.stringify(parsedData), 'utf8', (err) => {
+        var string = JSON.stringify(parsedData);
+
+        fs.writeFile(dataPath, string, 'utf8', (err) => {
           if (err) { throw err; }
           console.log('wrote new data!');
           response.end(data);
@@ -69,9 +75,19 @@ module.exports.requestHandler = function(request, response) {
     });
 
 
-  } else if (request.method === 'POST' && request.url === '/classes/room') {
-    response.writeHead(201, headers);
-    response.end();
+  // } else if (request.method === 'POST' && request.url === '/classes/room') {
+  //   response.writeHead(201, headers);
+  //
+  //   var postData = '';
+  //   request.on('data', data => {
+  //     postData += data;
+  //   });
+  //
+  //   request.on('end', () => {
+  //     console.log('CLASSES/ROOM', postData);
+  //   })
+  //
+  //   response.end("GOOD JOB");
 
 
   } else if (request.method === 'OPTIONS') {
