@@ -1,18 +1,27 @@
 body {
-    background: #eee;
+    background: #021756;
     text-align: center;
     padding: 0 25px;
     font-family: arial, sans-serif;
 }
 
 #main, #chats {
-    width: 500px;
-    margin: auto;
-    text-align: left;
-    background: white;
-    padding: 50px 60px;
-    border: solid #ddd;
-    border-width: 0 1px 1px 1px;
+  width: 800px;
+  margin: auto;
+  text-align: left;
+  padding: 50px 60px;
+  border: solid #ddd;
+  border-width: 0 1px 1px 1px;
+  background: linear-gradient(to right, #72BA7B, #1DA1F2);
+  background-size: cover;
+  display: block;
+  font-family: "Helvetica Neue", Roboto, "Segoe UI", Calibri, sans-serif;
+  font-size: 12px;
+  line-height: 16px;
+  border-color: #eee #ddd #bbb;
+  border-radius: 5px;
+  border-style: solid;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 #main h1 {
@@ -63,6 +72,7 @@ form input[type=text] {
     padding: 5px;
     margin-bottom: 5px;
     background-color: #eee;
+    font-weight: 400;
 }
 
 .chat .username {
