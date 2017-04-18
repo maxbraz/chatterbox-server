@@ -16,7 +16,7 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 
 
-module.exports = function(request, response) {
+module.exports.requestHandler = function(request, response) {
   // Documentation for both request and response can be found in the HTTP section at
   // http://nodejs.org/documentation/api/
 
@@ -31,6 +31,7 @@ module.exports = function(request, response) {
   // set headers
   var headers = defaultCorsHeaders;
 
+
   if (request.method === 'GET' && request.url === '/classes/messages') {
     headers['Content-Type'] = 'application/json';
     response.writeHead(200, headers);
@@ -41,6 +42,7 @@ module.exports = function(request, response) {
       response.end(data);
     });
 
+
   } else if (request.method === 'POST' && request.url === '/classes/messages') {
     response.writeHead(201, headers);
 
@@ -50,34 +52,40 @@ module.exports = function(request, response) {
 
     request.on('data', data => {
       postData += data;
+    });
 
-    }).on('end', () => {
+    request.on('end', () => {
       var message = JSON.parse(postData);
       message.createdAt = Date.now();
 
-      var readStream = fs.createReadStream(dataPath, 'utf8')
-        .on('data', chunk => { data += chunk; })
-        .on('end', () => {
-          var parsedData = JSON.parse(data);
-          parsedData.results.unshift(message);
+      var readStream = fs.createReadStream(dataPath, 'utf8');
+      readStream.on('data', chunk => { data += chunk; });
+      readStream.on('end', () => {
+        var parsedData = JSON.parse(data);
+        parsedData.results.unshift(message);
 
-          fs.writeFile(dataPath, JSON.stringify(parsedData), 'utf8', (err) => {
-            if (err) { throw err; }
-            console.log('wrote new data!');
-            response.end();
-          });
-        })
-        .on('error', (err) => { throw err; });
+        fs.writeFile(dataPath, JSON.stringify(parsedData), 'utf8', (err) => {
+          if (err) { throw err; }
+          console.log('wrote new data!');
+          response.end();
+        });
+      });
+
+      readStream.on('error', (err) => { throw err; });
     });
+
+
   } else if (request.method === 'POST' && request.url === '/classes/room') {
     response.writeHead(201, headers);
     console.log('post to classes/room');
     response.end();
 
+
   } else if (request.method === 'OPTIONS') {
     console.log('post to classes/messages');
     response.writeHead(200, headers);
     response.end();
+
 
   } else {
     console.log('404');
