@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+
 /*************************************************************
 
 You should implement your request handler function in this file.
@@ -22,85 +23,65 @@ module.exports = function(request, response) {
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
   var defaultCorsHeaders = {
-    'access-control-allow-origin': '*',
+    'Access-Control-Allow-Origin': '*',
     'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'access-control-allow-headers': 'content-type, accept',
     'access-control-max-age': 10 // Seconds.
   };
-
   // set headers
   var headers = defaultCorsHeaders;
-  headers['Content-Type'] = 'application/json';
-
-  var statusCode = 200;
-  var responseBody = {};
 
   if (request.method === 'GET' && request.url === '/classes/messages') {
-    console.log('GET to classes/messages');
-
-    responseBody = {
-      results: []
-    };
-
-  } else if (request.method === 'POST' && request.url === '/classes/messages') {
-    statusCode = 201;
+    headers['Content-Type'] = 'application/json';
+    response.writeHead(200, headers);
 
     var dataPath = path.join(__dirname, 'data.json');
 
+    fs.readFile(dataPath, 'utf8', (error, data) => {
+      response.end(data);
+    });
+
+  } else if (request.method === 'POST' && request.url === '/classes/messages') {
+    response.writeHead(201, headers);
+
+    var postData = '';
+    var dataPath = path.join(__dirname, 'data.json');
     var data = '';
 
-    var readStream = fs.createReadStream(dataPath, 'utf8')
-      .on('data', chunk => { data += chunk; })
-      .on('end', () => {
-        var parsedData = JSON.parse(data);
-        console.log(parsedData.results);
-        console.log('*******request******: ', request);
-        // parsedData.results.push(message);
-        debugger;
-      })
-      .on('error', (err) => { throw err; });
+    request.on('data', data => {
+      postData += data;
 
-    // .pipe(ourParseFn).pipe(fs.write)
+    }).on('end', () => {
+      var message = JSON.parse(postData);
+      message.createdAt = Date.now();
 
+      var readStream = fs.createReadStream(dataPath, 'utf8')
+        .on('data', chunk => { data += chunk; })
+        .on('end', () => {
+          var parsedData = JSON.parse(data);
+          parsedData.results.unshift(message);
 
-
+          fs.writeFile(dataPath, JSON.stringify(parsedData), 'utf8', (err) => {
+            if (err) { throw err; }
+            console.log('wrote new data!');
+            response.end();
+          });
+        })
+        .on('error', (err) => { throw err; });
+    });
   } else if (request.method === 'POST' && request.url === '/classes/room') {
-    statusCode = 201;
+    response.writeHead(201, headers);
     console.log('post to classes/room');
+    response.end();
 
   } else if (request.method === 'OPTIONS') {
     console.log('post to classes/messages');
-    statusCode = 200;
+    response.writeHead(200, headers);
+    response.end();
 
   } else {
     console.log('404');
     response.statusCode = 404;
     response.end();
   }
-
-  response.writeHead(statusCode, headers);
-  response.write(JSON.stringify(responseBody), 'utf-8');
-  // let body = [];
-
-  // request.on('error', function(err) {
-  //   console.error(err);
-  // }).on('data', function(chunk) {
-  //   body.push(chunk);
-  // }).on('end', function() {
-  //   body = Buffer.concat(body).toString();
-  //   // BEGINNING OF NEW STUFF
-  //   console.log({ body });
-  //   response.on('error', function(err) {
-  //     console.error(err);
-  //   });
-  // });
-
-  // Make sure to always call response.end() - Node may not send
-  // anything back to the client until you do. The string you pass to
-  // response.end() will be the body of the response - i.e. what shows
-  // up in the browser.
-  //
-  // Calling .end "flushes" the response's internal buffer, forcing
-  // node to actually send all the data over to the client.
-  response.end();
 };

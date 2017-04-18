@@ -27,7 +27,7 @@
 const App = function() {
   this.param = new URLSearchParams(window.location.search);
   this.username = this.param.get('username');
-  this.server = 'http://127.0.0.1:3000/';
+  this.server = 'http://127.0.0.1:3000/classes/messages';
   this.rooms = [];
   this.lastMessageID = null;
   this.friends = {};
@@ -44,9 +44,9 @@ App.prototype.fetch = function() {
     url: this.server,
     type: 'GET',
     contentType: 'application/json',
-    data: 'order=-createdAt&limit=200',
+    // data: 'order=-createdAt&limit=200',
     success: (messageObject) => {
-
+      debugger;
       for ( var i = 0; i < messageObject.results.length; i++ ) {
         const message = messageObject.results[i];
         this.renderMessage(message);
@@ -73,7 +73,7 @@ App.prototype.update = function() {
     url: this.server,
     type: 'GET',
     contentType: 'application/json',
-    data: 'order=-createdAt&limit=200',
+    // data: 'order=-createdAt&limit=200',
     success: (messageObject) => {
       const $firstChat = $('.chat:first');
 
