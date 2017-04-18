@@ -101,6 +101,7 @@ describe('Node Server Request Listener Function', function() {
     res = new stubs.response();
 
     handler.requestHandler(req, res);
+    
     setTimeout(() => {
       expect(res._responseCode).to.equal(200);
       var messages = JSON.parse(res._data).results;

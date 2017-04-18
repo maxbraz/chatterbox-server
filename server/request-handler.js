@@ -41,6 +41,7 @@ module.exports.requestHandler = function(request, response) {
       response.end(data);
     });
 
+
   } else if (request.method === 'POST' && request.url === '/classes/messages') {
     response.writeHead(201, headers);
 
@@ -67,13 +68,16 @@ module.exports.requestHandler = function(request, response) {
       });
     });
 
+
   } else if (request.method === 'POST' && request.url === '/classes/room') {
     response.writeHead(201, headers);
     response.end();
 
+
   } else if (request.method === 'OPTIONS') {
     response.writeHead(200, headers);
     response.end();
+
 
   } else {
     response.writeHead(404, headers);
